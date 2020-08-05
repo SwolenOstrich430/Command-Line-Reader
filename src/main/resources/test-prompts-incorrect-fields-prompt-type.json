@@ -1,0 +1,11 @@
+[
+  {
+    "promptType": "NOT_VALID_TYPE",
+    "variableType": "STRING",
+    "variableName": "databaseName",
+    "text": "What is your database name?",
+    "isOptional": false,
+    "variableName": "variableName"
+  }
+]
+

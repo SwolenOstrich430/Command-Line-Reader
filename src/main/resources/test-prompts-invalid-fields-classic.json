@@ -1,0 +1,10 @@
+[
+  {
+    "variableType": "STRING",
+    "variableName": "bullshit",
+    "promptType": "CLASSIC",
+    "text": "this isn't a valid prompt",
+    "isOptional": false,
+    "thisFieldIsntReal": true
+  }
+]

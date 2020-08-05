@@ -1,0 +1,7 @@
+{
+  "promptType": "CLASSIC",
+  "variableName": "meh",
+  "isOptional": true,
+  "text": "this is some text",
+  "variableType" "long"
+}

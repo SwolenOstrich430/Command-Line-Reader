@@ -1,0 +1,79 @@
+[
+    {
+      "promptType": "boolean",
+      "variableType": "boolean",
+      "variableName": "issql",
+      "text": "is your database relational?",
+      "isoptional": false
+    },
+
+    {
+      "promptType": "boolean",
+      "variableType": "boolean",
+      "variableName": "isSQL",
+      "text": "Is your database relational?",
+      "isOptional": false
+    },
+
+    {
+      "promptType": "classic",
+      "variableType": "String",
+      "variableName": "databaseName",
+      "text": "What is your database name?",
+      "isOptional": false
+    },
+
+    {
+      "promptType": "classic",
+      "variableType": "integer",
+      "variableName": "portNumber",
+      "text": "What is your port number?",
+      "isOptional": false
+    },
+
+    {
+      "promptType": "classic",
+      "variableType": "double",
+      "variableName": "remainder",
+      "text": "What is the remainder of 10 / 3?",
+      "isOptional": false
+    },
+
+    {
+      "promptType": "multiple-choice",
+      "variableType": "integer",
+      "variableName": "favoriteNumber",
+      "expectedType": "integer",
+      "text": "What is your favorite number?",
+      "isOptional": true,
+      "optionsAndValues": {
+        "one": "1",
+        "two": "2",
+        "three": "3",
+        "four": "4"
+      }
+    },
+
+    {
+      "promptType": "multiple-choice",
+      "variableType": "integer",
+      "variableName": "favoriteNumber",
+      "expectedType": "integer",
+      "text": "What is your favorite number?",
+      "isOptional": true,
+      "optionsAndValues": {
+        "one": "1",
+        "two": "2",
+        "three": "3",
+        "four": "4"
+      }
+    },
+
+    {
+      "variableType": "boolean",
+      "variableName": "shouldAnswerQuestion",
+      "expectedType": "boolean",
+      "text": "You should answer this question.",
+      "isOptional": false
+    }
+]

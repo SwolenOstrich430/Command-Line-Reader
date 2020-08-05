@@ -1,0 +1,38 @@
+{
+  "connectionStrings": [
+    {
+      "connectionString": "jdbc:mysql://127.0.0.1:3306/Example_DB?useLegacyDatetimeCode=false&serverTimezone=UTC",
+      "user": "root",
+      "password": "Panthers123",
+      "expected": true
+    },
+    {
+      "connectionString": "jdbc:mysql://127.0.0.1:3306/?useLegacyDatetimeCode=false&serverTimezone=UTC",
+      "expected": false
+    },
+    {
+      "connectionString": "jdbc:mysql://%s/root/Goal_Setter?useLegacyDatetimeCode=false&serverTimezone=UTC",
+      "user": "root",
+      "password": "Panthers123",
+      "expected": false
+    },
+    {
+      "connectionString": "jdbc:mysql://127.0.0.1:3306/%s/Example_DB?useLegacyDatetimeCode=false&serverTimezone=UTC",
+      "user": "root",
+      "password": "nope",
+      "expected": false
+    },
+    {
+      "connectionString": "jdbc:%s//127.0.0.1:3306/root/Example_DB?useLegacyDatetimeCode=false&serverTimezone=UTC",
+      "user": "blah",
+      "password": "Panthers123",
+      "expected": false
+    },
+    {
+      "connectionString": "just wrong",
+      "user": "root",
+      "password": "Panthers123",
+      "expected": false
+    }
+  ]
+}

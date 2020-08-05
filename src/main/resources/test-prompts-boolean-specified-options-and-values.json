@@ -1,0 +1,10 @@
+[
+  {
+    "variableName": "blah",
+    "promptType": "BOOLEAN",
+    "text": "here is some text",
+    "isOptional": true,
+    "text": "this doesn't matter",
+    "optionsAndValues": "this property shouldn't exist"
+  }
+]

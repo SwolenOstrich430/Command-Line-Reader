@@ -1,0 +1,9 @@
+[
+  {
+    "variableType": "STRING",
+    "promptType": "CLASSIC",
+    "text": "this is some text that's going to be a thing",
+    "variableName": "meh",
+    "isOptional": "balls"
+  }
+]
