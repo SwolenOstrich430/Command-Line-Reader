@@ -55,7 +55,14 @@ public class Prompt {
         isOptional = isOptional;
     }
 
+    @Override
+    public String toString() {
+        return text;
+    }
+
     public Map<?, ?> getOptionsAndValues() {
         return new HashMap<String, String>();
     }
+
+
 }

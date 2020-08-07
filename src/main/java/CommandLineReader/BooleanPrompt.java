@@ -11,8 +11,8 @@ public class BooleanPrompt extends Prompt {
     }};
 
 
-    public BooleanPrompt(String variableName, String prompt, boolean isOptional) {
-        super("boolean", variableName, prompt, isOptional);
+    public BooleanPrompt(String variableName, String text, boolean isOptional) {
+        super("BOOLEAN", variableName, text, isOptional);
     }
 
     public BooleanPrompt(String variableName, String text) {
@@ -20,6 +20,12 @@ public class BooleanPrompt extends Prompt {
     }
 
     public BooleanPrompt() {}
+
+    @Override
+    public String toString() {
+        return getText() + " Answer 'yes' or 'no'.";
+    }
+
 
     @Override
     public Map<String, Boolean> getOptionsAndValues() {
