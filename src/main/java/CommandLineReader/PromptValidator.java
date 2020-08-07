@@ -43,20 +43,21 @@ public class PromptValidator {
     public static void validateFields(String promptType, ObjectNode node, int currIndex) throws IncorrectPromptFieldException {
         PromptSupplier promptSupplier = new PromptSupplier();
         Class promptClassToTestAgainst = promptSupplier.supplyPrompt(PromptType.valueOf(promptType)).getClass();
-        Map<String, Field> declaredAndInheritedFields = getAllFields(new HashMap<String, Field>, promptClassToTestAgainst);
+        Map<String, Field> declaredAndInheritedFields = getAllFields(new HashMap<String, Field>(), promptClassToTestAgainst);
 
 
         for (Iterator<String> it = node.fieldNames(); it.hasNext(); ) {
             String field = it.next();
             if(field == "promptType") continue;
 
-            try {
-                Field potentialField = promptClassToTestAgainst.getDeclaredField(field);
+            if(promptType.equals("BOOLEAN") && field.equals("optionsAndValues")) {
+                throw new IncorrectPromptFieldException(
+                        String.format(INVALID_PROPERTY_EXCEPTION_MESSAGE_TEMPLATE, field, currIndex)
+                );
+            }
 
-                if(promptType.equals("BOOLEAN") && field.equals("optionsAndValues")) {
-                    throw new IncorrectPromptFieldException();
-                }
-            } catch(NoSuchFieldException exception) {
+            Field potentialField = declaredAndInheritedFields.get(field);
+            if(potentialField == null) {
                 throw new IncorrectPromptFieldException(
                         String.format(INVALID_PROPERTY_EXCEPTION_MESSAGE_TEMPLATE, field, currIndex)
                 );
