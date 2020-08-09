@@ -1,7 +1,6 @@
 package CommandLineReader;
 
 public enum VariableType {
-
     BOOLEAN("boolean"),
     STRING("String"),
     INTEGER("integer"),

@@ -9,13 +9,14 @@ public class Prompt {
     private String variableName;
     private String text;
     private boolean isOptional;
-
+    private String answer;
 
     public Prompt(String variableType, String variableName, String text, boolean isOptional) {
         this.variableType = VariableType.valueOf(variableType);
         this.variableName = variableName;
         this.text = text;
         this.isOptional = isOptional;
+        this.answer = "";
     }
 
     Prompt(String variableType, String variableName, String text) {
@@ -54,6 +55,32 @@ public class Prompt {
     public void setIsOptional(boolean isOptional) {
         isOptional = isOptional;
     }
+
+    @SuppressWarnings("unchecked")
+    public <T> T getAnswerAsVariableType() {
+        switch(variableType) {
+            case INTEGER:
+                return (T) Integer.valueOf(answer);
+            case DOUBLE:
+                return (T) Double.valueOf(answer);
+            case BOOLEAN:
+                throw new IllegalArgumentException("Please use BooleanPrompt if you want to return a boolean value " +
+                        "from a Prompt object.");
+            default:
+                return (T) answer;
+        }
+    }
+
+    public String getAnswer() {
+        return answer;
+    }
+
+
+    public void setAnswer(String answer) {
+        this.answer = answer;
+    }
+
+
 
     @Override
     public String toString() {
