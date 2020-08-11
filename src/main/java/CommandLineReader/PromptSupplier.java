@@ -34,8 +34,6 @@ public class PromptSupplier {
         try {
             prompt = new ObjectMapper().readValue(promptAsJson, prompt.getClass());
         } catch (IOException e) {
-            System.out.println(e.getMessage());
-            System.out.println("Could not create prompt of prompt type: " + promptType.toString());
             return Optional.empty();
         }
 

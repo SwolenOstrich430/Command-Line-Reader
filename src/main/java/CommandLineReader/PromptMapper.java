@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
@@ -15,23 +16,42 @@ public class PromptMapper {
     private String fileName;
     private PromptSupplier promptSupplier;
     private ObjectMapper objectMapper;
+    private PromptValidator promptValidator;
 
     public PromptMapper() {
         this.promptSupplier = new PromptSupplier();
         this.objectMapper = new ObjectMapper();
+        this.promptValidator = new PromptValidator();
     }
 
-    public ObjectNode[] getPromptsAsJson(String fileName) throws IOException, IncorrectPromptFieldException {
+    public ObjectNode[] getPromptsAsJson(String fileName) throws Throwable {
         ObjectNode[] promptsAsJson = objectMapper.readValue(Paths.get(fileName).toFile(), ObjectNode[].class);
 
         for(int i = 0; i < promptsAsJson.length; i++) {
-            PromptValidator.validateJsonPrompt(promptsAsJson[i], i);
+            validateObjectNodeIsValidPrompt(promptsAsJson[i], i);
         }
 
         return promptsAsJson;
     }
 
-    public List<Prompt> getPrompts(String fileName) throws IOException, IncorrectPromptFieldException {
+    public void validateObjectNodeIsValidPrompt(ObjectNode node, int currIndex) throws Throwable {
+        try {
+            promptValidator.validateJsonPrompt(node, currIndex);
+        } catch (InvocationTargetException e) {
+            if(e.getTargetException() instanceof IncorrectPromptFieldException) {
+                throw e.getTargetException();
+            }
+        } catch (NoSuchMethodException e) {
+            // add logging to this
+            System.out.println(e.getMessage());
+            System.out.println(e.getStackTrace());
+        } catch (IllegalAccessException e) {
+            System.out.println(e.getMessage());
+            System.out.println(e.getStackTrace());
+        }
+    }
+
+    public List<Prompt> getPrompts(String fileName) throws Throwable {
        ObjectNode[] promptsAsJson = getPromptsAsJson(fileName);
        List prompts = new ArrayList();
 

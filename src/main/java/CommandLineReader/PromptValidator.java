@@ -3,12 +3,15 @@ package CommandLineReader;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
 public class PromptValidator {
     private static final String PROMPT_TYPE = "promptType";
+    private static final String METHOD_PREFIX = "validate";
     private static final int MIN_PROMPT_LENGTH = 10;
     private static final int MAX_PROMPT_LENGTH = 140;
     private static final String PROMPT_TYPE_EXCEPTION_MESSAGE_TEMPLATE = "Invalid prompt type of %s at index %d. " +
@@ -21,51 +24,93 @@ public class PromptValidator {
             "%d. Value must be true or false, or the key-value pair must be excluded to default to false.";
     private static final String INVALID_PROPERTY_EXCEPTION_MESSAGE_TEMPLATE = "Invalid field of '%s' " +
             "at index %d.";
+    private final PromptSupplier promptSupplier = new PromptSupplier();
 
-    public static void validateJsonPrompt(ObjectNode node, int currIndex) throws IncorrectPromptFieldException {
-        String promptType = node.get(PROMPT_TYPE).asText();
-        validatePromptType(promptType, currIndex);
 
-        validateFields(promptType, node, currIndex);
+    public void validateJsonPrompt(ObjectNode node, int currIndex)
+            throws IncorrectPromptFieldException, NoSuchMethodException, InvocationTargetException,
+            IllegalAccessException {
+        validatePromptType(getPromptTypeAsStringFromNode(node), currIndex);
+        validateNodeFields(node, currIndex);
 
-        String variableType = node.get("variableType").asText();
-        validateVariableType(variableType, currIndex);
+        String currField;
+        String currValue;
 
-        String promptText = node.get("text").asText();
-        validatePromptText(promptText, currIndex);
+        for(Iterator it = node.fieldNames(); it.hasNext();) {
+            currField = it.next().toString();
+            currValue = node.get(currField).asText();
 
-        if(node.has("isOptional")) {
-            String isOptionalText = node.get("isOptional").asText();
-            validateIsOptional(isOptionalText, currIndex);
+            Method validateMethod = getValidateMethodByFieldAsString(currField);
+            validateMethod.invoke(this, currValue, currIndex);
         }
+
     }
 
-    public static void validateFields(String promptType, ObjectNode node, int currIndex) throws IncorrectPromptFieldException {
-        PromptSupplier promptSupplier = new PromptSupplier();
-        Class promptClassToTestAgainst = promptSupplier.supplyPrompt(PromptType.valueOf(promptType)).getClass();
-        Map<String, Field> declaredAndInheritedFields = getAllFields(new HashMap<String, Field>(), promptClassToTestAgainst);
+    private Method getValidateMethodByFieldAsString(String fieldAsString) throws NoSuchMethodException {
+        String validateMethodName = getValidateMethodNameByField(fieldAsString);
+        Method validateMethod = this.getClass().getMethod(validateMethodName, String.class, int.class);
 
+        return validateMethod;
+    }
 
-        for (Iterator<String> it = node.fieldNames(); it.hasNext(); ) {
+    private String getValidateMethodNameByField(String fieldAsString) {
+        String firstLetterOfFieldToUpperCase = fieldAsString.substring(0, 1).toUpperCase();
+        String restOfFieldInCamelCase = fieldAsString.substring(1);
+
+        return METHOD_PREFIX + firstLetterOfFieldToUpperCase + restOfFieldInCamelCase;
+    }
+
+    public void validateNodeFields(ObjectNode node, int currIndex) throws IncorrectPromptFieldException {
+        Class promptClassToTestAgainst = getPromptClassByJsonNode(node);
+        Map<String, Field> declaredAndInheritedFields = getCurrentAndParentClassFields(
+                new HashMap<String, Field>(), promptClassToTestAgainst);
+
+        for (Iterator<String> it = node.fieldNames(); it.hasNext();) {
             String field = it.next();
-            if(field == "promptType") continue;
+            if(field.equals("promptType")) continue;
 
-            if(promptType.equals("BOOLEAN") && field.equals("optionsAndValues")) {
-                throw new IncorrectPromptFieldException(
-                        String.format(INVALID_PROPERTY_EXCEPTION_MESSAGE_TEMPLATE, field, currIndex)
-                );
-            }
-
-            Field potentialField = declaredAndInheritedFields.get(field);
-            if(potentialField == null) {
-                throw new IncorrectPromptFieldException(
-                        String.format(INVALID_PROPERTY_EXCEPTION_MESSAGE_TEMPLATE, field, currIndex)
-                );
-            }
+            validateNodeDoesNotContainOptionsAndValuesIfBoolean(node, field, currIndex);
+            validateNodeField(field, declaredAndInheritedFields, currIndex);
         }
     }
 
-    private static Map<String, Field> getAllFields(Map<String, Field> fields, Class<?> type) {
+    public void validateNodeField(String fieldToValidate, Map<String, Field> declaredAndInheritedFields, int currIndex)
+            throws IncorrectPromptFieldException {
+
+        Field potentialField = declaredAndInheritedFields.get(fieldToValidate);
+        if(potentialField == null) {
+            throw new IncorrectPromptFieldException(
+                    String.format(INVALID_PROPERTY_EXCEPTION_MESSAGE_TEMPLATE, fieldToValidate, currIndex)
+            );
+        }
+    }
+
+    private void validateNodeDoesNotContainOptionsAndValuesIfBoolean(ObjectNode node, String field, int currIndex)
+            throws IncorrectPromptFieldException {
+        String promptTypeAsString = getPromptTypeAsStringFromNode(node);
+
+        if(promptTypeAsString.equals("BOOLEAN") && field.equals("optionsAndValues")) {
+            throw new IncorrectPromptFieldException(
+                    String.format(INVALID_PROPERTY_EXCEPTION_MESSAGE_TEMPLATE, field, currIndex)
+            );
+        }
+    }
+
+    private String getPromptTypeAsStringFromNode(ObjectNode node) {
+        String promptTypeAsString = node.get(PROMPT_TYPE).asText();
+        return promptTypeAsString;
+    }
+
+
+    private Class getPromptClassByJsonNode(ObjectNode node) {
+        String promptTypeAsString = node.get(PROMPT_TYPE).asText();
+        PromptType promptType = PromptType.valueOf(promptTypeAsString);
+        Prompt prompt = promptSupplier.supplyPrompt(promptType);
+
+        return prompt.getClass();
+    }
+
+    private Map<String, Field> getCurrentAndParentClassFields(Map<String, Field> fields, Class<?> type) {
         for(Field field : type.getDeclaredFields()) {
             fields.put(field.getName(), field);
         }
@@ -74,10 +119,10 @@ public class PromptValidator {
             return fields;
         }
 
-        return getAllFields(fields, type.getSuperclass());
+        return getCurrentAndParentClassFields(fields, type.getSuperclass());
     }
 
-    private static void validateVariableType(String variableType, int currIndex) throws IncorrectPromptFieldException {
+    public void validateVariableType(String variableType, int currIndex) throws IncorrectPromptFieldException {
         try {
             VariableType potentialVariableType = VariableType.valueOf(variableType);
         } catch(IllegalArgumentException exception) {
@@ -87,7 +132,7 @@ public class PromptValidator {
         }
     }
 
-    private static void validatePromptType(String promptType, int currIndex) throws IncorrectPromptFieldException {
+    public void validatePromptType(String promptType, int currIndex) throws IncorrectPromptFieldException {
        try {
            PromptType potentialPromptType = PromptType.valueOf(promptType);
        } catch(IllegalArgumentException exception) {
@@ -97,7 +142,7 @@ public class PromptValidator {
        }
     }
 
-    private static void validatePromptText(String promptText, int currIndex) throws IncorrectPromptFieldException {
+    public void validateText(String promptText, int currIndex) throws IncorrectPromptFieldException {
         if(promptText.length() < MIN_PROMPT_LENGTH || promptText.length() > MAX_PROMPT_LENGTH) {
             throw new IncorrectPromptFieldException(
                     String.format(PROMPT_TEXT_EXCEPTION_MESSAGE_TEMPLATE, promptText, currIndex, MIN_PROMPT_LENGTH,
@@ -106,7 +151,7 @@ public class PromptValidator {
         }
     }
 
-    private static void validateIsOptional(String isOptional, int currIndex) throws IncorrectPromptFieldException {
+    public void validateIsOptional(String isOptional, int currIndex) throws IncorrectPromptFieldException {
         if(isOptional.toLowerCase().equals("true") || isOptional.toLowerCase().equals("false")) {
             return;
         } else {
@@ -116,4 +161,7 @@ public class PromptValidator {
         }
 
     }
+
+    public void validateVariableName(String variableName, int currIndex) throws IncorrectPromptFieldException {}
+
 }

@@ -36,7 +36,7 @@ public class BooleanPrompt extends Prompt {
     }
 
     @Override
-    public void setAnswer(String answer) {
+    public void setAnswer(String answer) throws IllegalArgumentException {
         String answerAsLowerCase = answer.toLowerCase();
 
         if(answerAsLowerCase.startsWith(AFFIRMATIVE_ANSWER.substring(0, 1))) {
