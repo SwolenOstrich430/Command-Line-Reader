@@ -60,9 +60,7 @@ public class PromptMapper {
        }
 
        for(ObjectNode promptAsJson : promptsAsJson) {
-           String promptTypeAsString = promptAsJson.get("promptType").asText();
-           PromptType promptType = PromptType.valueOf(promptTypeAsString);
-
+           PromptType promptType = getPromptTypeFromObjectNode(promptAsJson);
            promptAsJson.remove("promptType");
            Optional<Prompt> potentialPrompt = promptSupplier.supplyPrompt(promptType, promptAsJson.toString());
 
@@ -72,5 +70,12 @@ public class PromptMapper {
        }
 
        return prompts;
+    }
+
+    private PromptType getPromptTypeFromObjectNode(ObjectNode node) {
+        String promptTypeAsString = node.get("promptType").asText();
+        PromptType promptType = PromptType.valueOf(promptTypeAsString);
+
+        return promptType;
     }
 }

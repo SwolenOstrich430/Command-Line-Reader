@@ -39,7 +39,7 @@ public class PromptValidator {
         for(Iterator it = node.fieldNames(); it.hasNext();) {
             currField = it.next().toString();
             currValue = node.get(currField).asText();
-            validateValueByField(currValue, currField);
+            validateValueByField(currValue, currField, currIndex);
         }
 
     }
@@ -68,10 +68,10 @@ public class PromptValidator {
         }
     }
 
-    public void validateValueByField(String valueToValidate, String correspondingField)
+    public void validateValueByField(String valueToValidate, String correspondingField, int currIndex)
             throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         Method validateMethod = getValidateMethodByFieldAsString(correspondingField);
-        validateMethod.invoke(this, valueToValidate, correspondingField);
+        validateMethod.invoke(this, valueToValidate, currIndex);
     }
 
     private Class getPromptClassByJsonNode(ObjectNode node) {
