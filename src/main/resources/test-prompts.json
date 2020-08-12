@@ -1,49 +1,47 @@
 [
     {
-      "promptType": "boolean",
-      "variableType": "boolean",
+      "promptType": "BOOLEAN",
       "variableName": "issql",
       "text": "is your database relational?",
-      "isoptional": false
+      "isOptional": false
     },
 
     {
-      "promptType": "boolean",
-      "variableType": "boolean",
+      "promptType": "BOOLEAN",
       "variableName": "isSQL",
       "text": "Is your database relational?",
       "isOptional": false
     },
 
     {
-      "promptType": "classic",
-      "variableType": "String",
+      "promptType": "CLASSIC",
+      "variableType": "STRING",
       "variableName": "databaseName",
       "text": "What is your database name?",
       "isOptional": false
     },
 
     {
-      "promptType": "classic",
-      "variableType": "integer",
+      "promptType": "CLASSIC",
+      "variableType": "INTEGER",
       "variableName": "portNumber",
       "text": "What is your port number?",
       "isOptional": false
     },
 
     {
-      "promptType": "classic",
-      "variableType": "double",
+      "promptType": "CLASSIC",
+      "variableType": "DOUBLE",
       "variableName": "remainder",
       "text": "What is the remainder of 10 / 3?",
       "isOptional": false
     },
 
     {
-      "promptType": "multiple-choice",
-      "variableType": "integer",
+      "promptType": "MULTIPLE_CHOICE",
+      "variableType": "INTEGER",
       "variableName": "favoriteNumber",
-      "expectedType": "integer",
+
       "text": "What is your favorite number?",
       "isOptional": true,
       "optionsAndValues": {
@@ -55,10 +53,9 @@
     },
 
     {
-      "promptType": "multiple-choice",
-      "variableType": "integer",
+      "promptType": "MULTIPLE_CHOICE",
+      "variableType": "INTEGER",
       "variableName": "favoriteNumber",
-      "expectedType": "integer",
       "text": "What is your favorite number?",
       "isOptional": true,
       "optionsAndValues": {
@@ -70,9 +67,8 @@
     },
 
     {
-      "variableType": "boolean",
+      "promptType": "BOOLEAN",
       "variableName": "shouldAnswerQuestion",
-      "expectedType": "boolean",
       "text": "You should answer this question.",
       "isOptional": false
     }

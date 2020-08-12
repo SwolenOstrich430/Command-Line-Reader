@@ -1,0 +1,8 @@
+yes
+no
+database name
+8080
+3.333333
+two
+three
+no

@@ -75,11 +75,12 @@ public class MultiChoicePrompt extends Prompt {
     }
 
     @Override
-    public void setAnswer(String answer) {
-        if(optionsAndValues.containsKey(answer)) {
-            super.setAnswer(answer);
+    public void setAnswer(String answerKey) {
+        if(optionsAndValues.containsKey(answerKey)) {
+            String answerValue = optionsAndValues.get(answerKey);
+            super.setAnswer(answerValue);
         } else {
-            String exceptionMessage = String.format(ILLEGAL_ANSWER_TEMPLATE, answer, getOptionsAsStringInline());
+            String exceptionMessage = String.format(ILLEGAL_ANSWER_TEMPLATE, answerKey, getOptionsAsStringInline());
             throw new IllegalArgumentException(exceptionMessage);
         }
     }
